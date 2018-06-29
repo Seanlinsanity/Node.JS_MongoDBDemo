@@ -53,7 +53,7 @@ async function getCourse(){
         // .find({ author: /Mosh$/i}) //author ends with Mosh
         // .find({ author: /.*Mosh.*/i}) //author contains Mosh
         //.limit(10)
-        .skip((pageNumber -1) * pageSize )
+        .skip( (pageNumber -1) * pageSize )
         .limit(pageSize)
         .sort({ name: 1})  //1 indicates ascending order; -1 indicates descending order
         // .select({ name: 1, tags: 1})
@@ -61,4 +61,44 @@ async function getCourse(){
     console.log(courses)
 }
 
-getCourse()
+//getCourse()
+
+async function updateCourse(id) {
+
+    const course = await Course.findByIdAndUpdate(id, {
+        $set: {
+            author: 'Voong',
+            isPublished: false
+        }
+    }, { new: true})
+    
+    console.log(course)
+
+    // const result = await Course.update({ _id: id}, {
+    //     $set: {
+    //         author: 'Brian',
+    //         isPublished: true
+    //     }
+    // })
+    // console.log(result)
+
+    // const course = await Course.findById(id)
+    // if (!course) { return }
+    // course.author = 'Another Author'
+    // course.isPublished = false
+
+    // const result = await course.save()
+    // console.log(result)
+}
+
+//updateCourse('5b35a3b13993ec360bc2745c')
+
+async function removeCourse(id) {
+
+    const course = await Course.findByIdAndRemove(id)
+    console.log(course)
+    // const result = await Course.deleteOne({ _id: id})
+    // console.log(result)
+}
+
+removeCourse('5b35a3b13993ec360bc2745c')
