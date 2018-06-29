@@ -39,16 +39,25 @@ async function getCourse(){
     //in
     //nin (not in)
 
+    const pageNumber = 2
+    const pageSize = 10
+
     const courses = await Course
-        // .find({ author: 'Mosh', isPublished: true })
+        .find({ author: 'Mosh', isPublished: true })
         // .find({ price: { $gt: 10, $lt: 20 } })  // 10 < price < 20
         // .find({ price: { $in: [10, 15, 20] } }) // price = 10 or 15 or 20
-        .find()
-        .or([ { author: 'Mosh'}, {isPublished: true} ])
-        .and([ { author: 'Mosh'}, {isPublished: true} ])
-        .limit(10)
+        // .find()
+        // .or([ { author: 'Mosh'}, {isPublished: true} ])
+        // .and([ { author: 'Mosh'}, {isPublished: true} ])
+        // .find({ author: /^Mosh/ }) //author starts with Mosh (ex. Moshaaaaaaa)
+        // .find({ author: /Mosh$/i}) //author ends with Mosh
+        // .find({ author: /.*Mosh.*/i}) //author contains Mosh
+        //.limit(10)
+        .skip((pageNumber -1) * pageSize )
+        .limit(pageSize)
         .sort({ name: 1})  //1 indicates ascending order; -1 indicates descending order
-        .select({ name: 1, tags: 1})
+        // .select({ name: 1, tags: 1})
+        .count()
     console.log(courses)
 }
 
