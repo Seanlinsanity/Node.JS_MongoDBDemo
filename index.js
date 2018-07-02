@@ -13,17 +13,35 @@ const courseSchema = new mongoose.Schema({
     },
     category:{
         type: String,
-        enum: ['web', 'mobile', 'server']
+        required: true,
+        enum: ['web', 'mobile', 'server'],
+        lowercase: true,
+        trim: true
     },
     author: String,
-    tags: [String],
+    tags: {
+        type: Array,
+        validate: {
+            //custom async validator
+            isAsync: true,
+            validator: function(value, callback){
+                setTimeout(() => {
+                    const result = value && value.length > 0
+                    callback(result)
+                }, 2000);
+            },
+            message: 'A course should have at least one tag.'
+        }
+    },
     date: { type: Date, default: Date.now },
     isPublished: Boolean,
     price: {
         type: Number,
         required: function() { return this.isPublished },
         min: 10,
-        max: 20
+        max: 200,
+        get: value => Math.round(value),
+        set: value => Math.round(value)
     }
 })
 
@@ -32,18 +50,21 @@ const Course = mongoose.model('Course', courseSchema) //Course is a class
 async function createCourse(){
     const course = new Course({
         name: 'Swift course',
-        category: '-',
+        category: 'Mobile',
         author: 'Brian',
-        tags: ['Swift', 'iOS', 'Mobile'],
-        isPublished: true
+        tags: ['iOS'],
+        isPublished: true,
+        price: 15.8
     })
     
     try {
         //await course.validate()
         const result = await course.save()
         console.log(result)  
-    }catch (err){
-        console.log(err.message)
+    }catch (ex){
+        for (field in ex.errors){
+            console.log(ex.errors[field].message)
+        }
     } 
 }
 
@@ -63,7 +84,7 @@ async function getCourse(){
     const pageSize = 10
 
     const courses = await Course
-        .find({ author: 'Mosh', isPublished: true })
+        .find({ _id: '5b399b5dd82e49682949150e' })
         // .find({ price: { $gt: 10, $lt: 20 } })  // 10 < price < 20
         // .find({ price: { $in: [10, 15, 20] } }) // price = 10 or 15 or 20
         // .find()
@@ -73,15 +94,13 @@ async function getCourse(){
         // .find({ author: /Mosh$/i}) //author ends with Mosh
         // .find({ author: /.*Mosh.*/i}) //author contains Mosh
         //.limit(10)
-        .skip( (pageNumber -1) * pageSize )
-        .limit(pageSize)
+        // .skip( (pageNumber -1) * pageSize )
+        // .limit(pageSize)
         .sort({ name: 1})  //1 indicates ascending order; -1 indicates descending order
-        // .select({ name: 1, tags: 1})
-        .count()
-    console.log(courses)
+        .select({ name: 1, tags: 1, price: 1})
+        //.count()
+    console.log(courses[0].price)
 }
-
-//getCourse()
 
 async function updateCourse(id) {
 
@@ -122,4 +141,5 @@ async function removeCourse(id) {
 }
 
 // removeCourse('5b35a3b13993ec360bc2745c')
-createCourse()
+//createCourse()
+getCourse()
