@@ -5,26 +5,46 @@ mongoose.connect('mongodb://localhost/playground')
     .catch((err) => console.error('Could not connect to MongoDB: ' + err))
 
 const courseSchema = new mongoose.Schema({
-    name: String,
+    name: { 
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 255
+    },
+    category:{
+        type: String,
+        enum: ['web', 'mobile', 'server']
+    },
     author: String,
     tags: [String],
     date: { type: Date, default: Date.now },
-    isPublished: Boolean
+    isPublished: Boolean,
+    price: {
+        type: Number,
+        required: function() { return this.isPublished },
+        min: 10,
+        max: 20
+    }
 })
 
 const Course = mongoose.model('Course', courseSchema) //Course is a class
 
 async function createCourse(){
-    const nodeCourse = new Course({
+    const course = new Course({
         name: 'Swift course',
-        author: 'Mosh',
+        category: '-',
+        author: 'Brian',
         tags: ['Swift', 'iOS', 'Mobile'],
         isPublished: true
     })
     
-    //nodeCourse.save() return a promise
-    const result = await nodeCourse.save()
-    console.log(result) 
+    try {
+        //await course.validate()
+        const result = await course.save()
+        console.log(result)  
+    }catch (err){
+        console.log(err.message)
+    } 
 }
 
 //createCourse()
@@ -101,4 +121,5 @@ async function removeCourse(id) {
     // console.log(result)
 }
 
-removeCourse('5b35a3b13993ec360bc2745c')
+// removeCourse('5b35a3b13993ec360bc2745c')
+createCourse()
