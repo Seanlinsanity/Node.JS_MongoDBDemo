@@ -109,7 +109,7 @@ async function updateCourse(id) {
             author: 'Voong',
             isPublished: false
         }
-    }, { new: true})
+    }, { new: true })
     
     console.log(course)
 
